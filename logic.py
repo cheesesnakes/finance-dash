@@ -3,6 +3,7 @@
 import pandas as pd
 from datetime import datetime, timedelta
 from data import get_data
+from dash import dash_table
 
 # import data
 
@@ -48,6 +49,10 @@ transactions['date'] = pd.to_datetime(transactions['date'], format='%Y-%m-%d')
 transactions['credit'] = pd.to_numeric(transactions['credit'])
 transactions['debit'] = pd.to_numeric(transactions['debit'])
 
+# last review date
+
+last_review_date = transactions[(transactions["reviewed"] == "Yes")]['date'].max()
+
 # Account summaries
 
 accounts = pd.DataFrame()
@@ -58,16 +63,21 @@ accounts['debit'] = transactions.groupby('account')['debit'].sum()
 
 accounts['balance'] = accounts['credit'] - accounts['debit']
 
+# Convert the accounts list into a Dash datatable
+accounts_table = dash_table.DataTable(
+    data=accounts,
+    columns=[{"name": i, "id": i} for i in accounts.columns],
+)
+
+# reimbursements
+
+work_expense = transactions[transactions['budget_head'] == 'Work Expense']
+
+reimbursement = -work_expense['credit'].sum() + work_expense['debit'].sum()
 
 # Loan and debt summaries
 
 current_debt = debt.iloc[-1]
-
-pd.DataFrame(current_debt)
-
-## only display loans and debt
-
-current_debt = current_debt[1:3]
 
 # Work expenses
 
@@ -115,6 +125,10 @@ spent_avg.rename(columns={'debit':'mean'}, inplace=True)
 ## merge monthly budgetted with spent
 
 budget = pd.merge(budget, spent_avg, on="budget_head", how="left")
+
+# Calculate available to spend this month
+
+available = budget['budgetted'].sum() - budget['debit'].sum()
 
 # spend over time
 
@@ -188,3 +202,53 @@ earn['Upper Bound'] = earn['Moving Average'] + earn['Standard Deviation'] #*1.96
 # Networth
 
 networth = accounts['balance'].sum() + list(debt.iloc[-1])[1] - list(debt.iloc[-1])[2]
+
+# Calculate the start date for six months ago from today
+end_date = datetime.now()
+start_date = end_date - timedelta(days=6*30)  # Assuming each month has 30 days for simplicity
+
+# Filter income data for the last six months
+income_180 = transactions[(transactions['date'] >= start_date) & (transactions['date'] <= end_date)]
+
+# filter out accounts
+
+account_list = accounts.index.tolist()
+
+income_180 = income_180[~income_180['budget_head'].isin(account_list)]
+
+# filter out expenditure budget_heads
+
+budget_head_list = budget['budget_head'].tolist()
+
+income_180 = income_180[~income_180['budget_head'].isin(budget_head_list)]
+
+# fixing remibursements
+
+income_180['budget_head'] = income_180['budget_head'].replace('Work Expense', 'Reimbursement')
+
+# Highest income sources ovr the last six months
+
+income_high = income_180.sort_values(by='credit', ascending=False).head(5)[['date', 'description', 'credit']]
+
+# Filter income data for the last six months
+expense_180 = transactions[(transactions['date'] >= start_date) & (transactions['date'] <= end_date)]
+
+# filter out accounts
+
+account_list = accounts.index.tolist()
+
+expense_180 = expense_180[~expense_180['budget_head'].isin(account_list)]
+
+# filter out expenditure budget_heads
+
+budget_head_list = budget['budget_head'].tolist()
+
+expense_180 = expense_180[expense_180['budget_head'].isin(budget_head_list)]
+
+# fixing remibursements
+
+expense_180['budget_head'] = expense_180['budget_head'].replace('Work Expense', 'Reimbursement')
+
+# largest expenses over the last six months
+
+expense_high = expense_180.sort_values(by='debit', ascending=False).head(5)[['date', 'description', 'debit']]
