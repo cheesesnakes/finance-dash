@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  finance_dashboard:
+    container_name: finance_dashboard
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: finance_dashboard
+    #ports:
+    # - "8866:8866"
+    restart: unless-stopped
+    networks:
+      - proxy
+      - internal
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.finance.entrypoints=http"
+      - "traefik.http.routers.finance.rule=Host(`finance.cheesesnakes.net`)"
+      - "traefik.http.middlewares.finance-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.finance.middlewares=finance-https-redirect, authelia@docker"
+      - "traefik.http.routers.finance-secure.entrypoints=https"
+      - "traefik.http.routers.finance-secure.rule=Host(`finance.cheesesnakes.net`)"
+      - "traefik.http.routers.finance-secure.tls=true"
+      - "traefik.http.routers.finance-secure.service=finance"
+      - "traefik.http.services.finance.loadbalancer.server.port=8050"
+      - "traefik.http.routers.finance-secure.middlewares=authelia@docker"
+      - "traefik.docker.network=proxy"
+
+networks:
+  proxy:
+    external: true
+  internal:
+    name: finance_dashboard_internal

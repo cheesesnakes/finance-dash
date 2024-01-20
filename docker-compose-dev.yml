@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  finance_dashboard:
+    container_name: finance_dashboard
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: finance_dashboard
+    ports:
+      - "8050:8050"
+    restart: unless-stopped
