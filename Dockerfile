@@ -1,5 +1,5 @@
 # Use a Python base image
-FROM python:3.10.9
+FROM python:3.10.12
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -8,10 +8,11 @@ WORKDIR /app
 COPY . /app
 
 # Install required dependencies from requirements.txt
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip   
 
-# Expose the port that Voilà will use (default is 8866)
+RUN pip install -r requirements.txt
+
+# Expose the port that dash uses
 EXPOSE 8050
 
 # Run Voilà when the container starts
