@@ -23,12 +23,13 @@ from logic import current_debt
 
 # Initialize the app
 app = dash.Dash(__name__)
+app.title = "Shawn's Financial Dashboard"
 
 # Define the app layout
-app.layout = html.Div([
+app.layout = html.Div(style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}, children=[
     html.H1("Shawn's Financial Dashboard"),
     
-    html.Div(id='summary', style={'margin':'auto', 'max_width':'500px'}, children=[
+    html.Div(id='summary', style={'display':'flex-wrap', 'margin':'auto', 'max_width':'500px'}, children=[
         
         html.H2('Summary'),
 
@@ -231,7 +232,7 @@ app.layout = html.Div([
         html.H2('Investments'),
         # Add more components for section 7 here
     ]),
-], style={'margin': 'auto', 'max-width': '1600px'})
+])
 
 # Run the app
 if __name__ == '__main__':
