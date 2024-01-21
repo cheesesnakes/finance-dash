@@ -43,6 +43,24 @@ h1, h2, h3 {
         flex: 1 0 100%;  /* Grow and shrink equally, don't allow flex items to shrink below 100% width */
     }
 }
+
+@media (max-width: 600px) {
+    #summary-2, #budget-2, #income-2, #expense-2, #balance-2, #investments-2 {
+        flex-direction: column !important;
+    }
+    #summary-2 > div, #budget-2 > div, #income-2 > div, #expense-2 > div, #balance-2 > div, #investments-2 > div {
+        flex: 1 0 100%;  /* Grow and shrink equally, don't allow flex items to shrink below 100% width */
+    }
+    #review-date, #networth, #available, #investment, #reimbursement, #loaned, #owed {
+        margin: 10px;
+        padding: 10px;
+    }
+    #budget-table, #income-table, #expense-table {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+}
+
 #budget-table, #income-table, #expense-table{
     border-radius: 6px;
     padding: 20px;
