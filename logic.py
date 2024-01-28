@@ -76,11 +76,9 @@ def last_review_date(transactions):
 
 # Account summaries
 
-def accounts():
+def accounts(transactions):
   
   accounts = pd.DataFrame()
-
-  transactions = get_transactions()
 
   accounts['credit'] = transactions.groupby('account')['credit'].sum()
 
@@ -94,12 +92,12 @@ def accounts():
 
 # Convert the accounts list into a Dash datatable
 
-def accounts_table():
+def accounts_table(transactions):
   
-  dat = accounts
+  dat = accounts(transactions)
 
   accounts_table = dash_table.DataTable(
-      data=accounts,
+      data=accounts(transactions),
       columns=[{"name": i, "id": i} for i in dat.columns],
   )
 
@@ -109,17 +107,13 @@ def accounts_table():
 
 # Networth
 
-def networth():
-  accounts_ = accounts()
-  debt = get_debt()
+def networth(accounts, debt):
   print("Caclulated networth")
-  return accounts_['balance'].sum() + list(debt.iloc[-1])[1] - list(debt.iloc[-1])[2]
+  return accounts['balance'].sum() + list(debt.iloc[-1])[1] - list(debt.iloc[-1])[2]
 
 # Loan and debt summaries
 
-def current_debt():
-
-  debt = get_debt()
+def current_debt(debt):
 
   print("Retrieved current debt")
   
@@ -127,10 +121,8 @@ def current_debt():
 
 # Work expenses
 
-def reimbursement():
+def reimbursement(transactions):
   
-  transactions = get_transactions()
-
   work_expense = transactions[transactions['budget_head'] == 'Work Expense']
 
   print("Calculated reimbursement")
@@ -139,13 +131,10 @@ def reimbursement():
 
 # Budget summary
 
-def budget_summary():
+def budget_summary(transactions):
 
-  #fetch data
-
-  transactions = get_transactions()
   budget = get_budget()
-  
+
   ## calculate spent amount over the last month
 
   ### filter transactions in the last month
@@ -190,23 +179,21 @@ def budget_summary():
 
 # Calculate available to spend this month
 
-def available():
-  budget = budget_summary()
+def available(budget):
   print("Calculated available to spend")
   return budget['budgetted'].sum() - budget['debit'].sum()
 
 # spend over time
 
-def spend_calc():
+def spend_calc(transactions, budget):
 
   ## assign data from data.py to spend variable
 
-  spend = get_transactions()
-  budget = get_budget()
-
+  spend = transactions
+  
   ## filter out accounts
 
-  account_list = accounts().index.tolist()
+  account_list = accounts(transactions).index.tolist()
 
   account_list.append('Work Expense')
 
@@ -238,14 +225,13 @@ def spend_calc():
 
 # Earnings data
 
-def earn_calc():
+def earn_calc(transactions, budget):
 
-  earn = get_transactions()
-  budget = get_budget()
-
+  earn = transactions
+  
   ## filter out accounts
 
-  account_list = accounts().index.tolist()
+  account_list = accounts(transactions).index.tolist()
 
   earn = earn[~earn['budget_head'].isin(account_list)]
 
@@ -274,10 +260,7 @@ def earn_calc():
 
   return earn
 
-def income_calc():
-
-  transactions = get_transactions()
-  budget = get_budget()
+def income_calc(transactions, budget):
 
   # Calculate the start date for six months ago from today
 
@@ -289,7 +272,7 @@ def income_calc():
 
   # filter out accounts
 
-  account_list = accounts().index.tolist()
+  account_list = accounts(transactions).index.tolist()
 
   income_180 = income_180[~income_180['budget_head'].isin(account_list)]
 
@@ -308,16 +291,13 @@ def income_calc():
 
 # Highest income sources ovr the last six months
 
-def income_high():
+def income_high(transactions, budget):
   
-  income_180 = income_calc()
+  income_180 = income_calc(transactions, budget)
 
   return income_180.sort_values(by='credit', ascending=False).head(5)[['date', 'description', 'credit']]
 
-def expense_calc():
-  
-  transactions = get_transactions()
-  budget = get_budget()
+def expense_calc(transactions, budget):
 
   # Calculate the start date for six months ago from today
 
@@ -330,7 +310,7 @@ def expense_calc():
 
   # filter out accounts
 
-  account_list = accounts().index.tolist()
+  account_list = accounts(transactions).index.tolist()
 
   expense_180 = expense_180[~expense_180['budget_head'].isin(account_list)]
 
@@ -350,8 +330,8 @@ def expense_calc():
 
 # largest expenses over the last six months
 
-def expense_high(): 
+def expense_high(transactions, budget): 
   
-  expense_180 = expense_calc()
+  expense_180 = expense_calc(transactions, budget)
 
   return expense_180.sort_values(by='debit', ascending=False).head(5)[['date', 'description', 'debit']]

@@ -8,9 +8,8 @@ from dash import dash_table
 
 
 from logic import get_transactions
-from logic import get_budget
 from logic import get_debt
-
+from logic import accounts
 from logic import last_review_date
 from logic import networth
 from logic import available
@@ -33,8 +32,9 @@ app.title = "Shawn's Financial Dashboard"
 def serve_layout():
 
     transactions = get_transactions()
-    budget = get_budget()
+    budget = budget_summary(transactions)
     debt = get_debt()
+    accounts_ = accounts(transactions)
 
     layout = html.Div(style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}, children=[
         html.H1("Shawn's Financial Dashboard"),
@@ -50,7 +50,7 @@ def serve_layout():
                 
                 html.H3('Last Review Date'),
                 
-                last_review_date().strftime('%d-%m-%Y, %A')
+                last_review_date(transactions).strftime('%d-%m-%Y, %A')
 
                 # Add a div for diplaying networth here
 
@@ -60,7 +60,7 @@ def serve_layout():
                 
                 html.H3('Net Worth'),
                 
-                round(networth())
+                round(networth(accounts_, debt))
                 # Add a div for diplaying networth here
 
             ]), 
@@ -69,7 +69,7 @@ def serve_layout():
                 
                 html.H3('Available'),
                 
-                round(available())
+                round(available(budget))
                 # Add a div for available here
 
             ]),
@@ -78,7 +78,7 @@ def serve_layout():
                 
                 html.H3('Reimbursement'),
 
-                round(reimbursement())
+                round(reimbursement(transactions))
             ]),
 
             # Add a div for available here
@@ -108,13 +108,13 @@ def serve_layout():
 
                 html.Div(id='trend-graph', style={'margin': '10px'}, children=[
 
-                    dcc.Graph(figure=spend_earn_fig())
+                    dcc.Graph(figure=spend_earn_fig(transactions, budget))
                 
                 ]),
 
                 html.Div(id='balance-graph', style={'margin': '10px'}, children=[
 
-                    dcc.Graph(figure=accounts_fig_gen())
+                    dcc.Graph(figure=accounts_fig_gen(transactions))
                 ]),
         ]),
         
@@ -131,8 +131,8 @@ def serve_layout():
                     dash_table.DataTable(
 
                         id='budget-table',
-                        columns=[{"name": i, "id": i} for i in budget_summary()[['budget_head', 'goal', 'budgetted', 'debit', 'mean']].columns],
-                        data=budget_summary()[['budget_head', 'goal', 'budgetted', 'debit', 'mean']].to_dict('records'),
+                        columns=[{"name": i, "id": i} for i in budget[['budget_head', 'goal', 'budgetted', 'debit', 'mean']].columns],
+                        data=budget[['budget_head', 'goal', 'budgetted', 'debit', 'mean']].to_dict('records'),
                     )
 
                 
@@ -140,7 +140,7 @@ def serve_layout():
 
                 html.Div(id='budget-graph', style={'margin': '10px'}, children=[
 
-                    dcc.Graph(figure=budget_fig_gen())
+                    dcc.Graph(figure=budget_fig_gen(transactions))
                 ]),
         ]),
 
@@ -158,8 +158,8 @@ def serve_layout():
                     dash_table.DataTable(
 
                         id='income-table',
-                        columns=[{"name": i, "id": i} for i in income_high().columns],
-                        data=income_high().to_dict('records'),
+                        columns=[{"name": i, "id": i} for i in income_high(transactions, budget).columns],
+                        data=income_high(transactions, budget).to_dict('records'),
                         style_data={
                             'whiteSpace': 'normal',
                             'height': 'auto'
@@ -171,7 +171,7 @@ def serve_layout():
 
                 html.Div(id='income-graph', style={'margin': '10px'}, children=[
 
-                    dcc.Graph(figure=income_fig_gen())
+                    dcc.Graph(figure=income_fig_gen(transactions, budget))
                 ]),
 
         ]),
@@ -191,8 +191,8 @@ def serve_layout():
                     dash_table.DataTable(
 
                         id='expense-table',
-                        columns=[{"name": i, "id": i} for i in expense_high().columns],
-                        data=expense_high().to_dict('records'),
+                        columns=[{"name": i, "id": i} for i in expense_high(transactions, budget).columns],
+                        data=expense_high(transactions, budget).to_dict('records'),
                         style_data={
                             'whiteSpace': 'normal',
                             'height': 'auto'
@@ -204,7 +204,7 @@ def serve_layout():
 
                 html.Div(id='expense-graph', style={'margin': '10px'}, children=[
 
-                    dcc.Graph(figure=expense_fig_gen())
+                    dcc.Graph(figure=expense_fig_gen(transactions, budget))
                 ]),
 
         ]),
@@ -221,7 +221,7 @@ def serve_layout():
                 
                 html.H3('Loaned Money'),
                 
-                current_debt()[1]
+                current_debt(debt)[1]
                 # Add a div for diplaying networth here
 
             ]),
@@ -230,7 +230,7 @@ def serve_layout():
                 
                 html.H3('Owed Money'),
                 
-                current_debt()[2]
+                current_debt(debt)[2]
                 # Add a div for diplaying networth here
 
             ]),

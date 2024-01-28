@@ -4,9 +4,9 @@ from logic import budget_summary, accounts, earn_calc, spend_calc, income_calc, 
 
 # make budegt figure
 
-def budget_fig_gen():
+def budget_fig_gen(transactions):
 
-    budget = budget_summary()
+    budget = budget_summary(transactions)
 
     # add bar plot of budgetted vs spent
 
@@ -28,11 +28,11 @@ def budget_fig_gen():
 
 # Bar plot for accounts
 
-def accounts_fig_gen():
+def accounts_fig_gen(transactions):
 
     # plot
 
-    accounts_fig = px.bar(accounts(), x=accounts().index, y='balance', title="Account Balance")
+    accounts_fig = px.bar(accounts(transactions), x=accounts(transactions).index, y='balance', title="Account Balance")
 
     # capitalise axis titles
 
@@ -49,11 +49,11 @@ def accounts_fig_gen():
 
 # Create the spend-earn graph
 
-def spend_earn_fig():
+def spend_earn_fig(transactions, budget):
 
-    earn = earn_calc()
+    earn = earn_calc(transactions, budget)
 
-    spend = spend_calc()
+    spend = spend_calc(transactions, budget)
 
     earn_fig = px.scatter(earn, x='date', y='credit', width=750, height=450, color_discrete_sequence=['green'])
 
@@ -80,9 +80,9 @@ def spend_earn_fig():
 
 # Create the box plot using Plotly Express
 
-def income_fig_gen():
+def income_fig_gen(transactions, budget):
 
-    income_180 = income_calc()
+    income_180 = income_calc(transactions, budget)
 
     income_fig = px.box(income_180, x='budget_head', y='credit', height=450, boxmode='group', width=800)
 
@@ -99,9 +99,9 @@ def income_fig_gen():
 
 # Expense summary figure
 
-def expense_fig_gen():
+def expense_fig_gen(transactions, budget):
 
-    expense_180 = expense_calc()
+    expense_180 = expense_calc(transactions, budget)
 
     # Create the box plot using Plotly Express
     
