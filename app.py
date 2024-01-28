@@ -1,26 +1,29 @@
 # Import necessary libraries
 import dash
-import dash_core_components as dcc
-import dash_html_components as html
+from dash import dcc
+from dash import html
+from dash import dash_table
 
 # importing data
 
+
+from logic import get_transactions
+from logic import get_budget
+from logic import get_debt
+
+from logic import last_review_date
 from logic import networth
 from logic import available
-from logic import budget
-from figs import budget_fig
-from dash import dash_table
-from figs import accounts_fig
-from figs import earn_fig
+from logic import budget_summary
+from figs import budget_fig_gen
+from figs import accounts_fig_gen
+from figs import spend_earn_fig
 from logic import income_high
-from figs import income_fig
+from figs import income_fig_gen
 from logic import expense_high
-from figs import expense_fig
-from logic import last_review_date
+from figs import expense_fig_gen
 from logic import reimbursement
 from logic import current_debt
-from data import get_data
-from dash import Input, Output
 
 # Initialize the app
 app = dash.Dash(__name__)
@@ -28,6 +31,11 @@ app.title = "Shawn's Financial Dashboard"
 
 # Define the app layout
 def serve_layout():
+
+    transactions = get_transactions()
+    budget = get_budget()
+    debt = get_debt()
+
     layout = html.Div(style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}, children=[
         html.H1("Shawn's Financial Dashboard"),
         
@@ -42,7 +50,7 @@ def serve_layout():
                 
                 html.H3('Last Review Date'),
                 
-                last_review_date.strftime('%d-%m-%Y, %A')
+                last_review_date().strftime('%d-%m-%Y, %A')
 
                 # Add a div for diplaying networth here
 
@@ -52,7 +60,7 @@ def serve_layout():
                 
                 html.H3('Net Worth'),
                 
-                round(networth)
+                round(networth())
                 # Add a div for diplaying networth here
 
             ]), 
@@ -61,7 +69,7 @@ def serve_layout():
                 
                 html.H3('Available'),
                 
-                round(available)
+                round(available())
                 # Add a div for available here
 
             ]),
@@ -70,7 +78,7 @@ def serve_layout():
                 
                 html.H3('Reimbursement'),
 
-                round(reimbursement)
+                round(reimbursement())
             ]),
 
             # Add a div for available here
@@ -100,13 +108,13 @@ def serve_layout():
 
                 html.Div(id='trend-graph', style={'margin': '10px'}, children=[
 
-                    dcc.Graph(figure=earn_fig)
+                    dcc.Graph(figure=spend_earn_fig())
                 
                 ]),
 
                 html.Div(id='balance-graph', style={'margin': '10px'}, children=[
 
-                    dcc.Graph(figure=accounts_fig)
+                    dcc.Graph(figure=accounts_fig_gen())
                 ]),
         ]),
         
@@ -123,8 +131,8 @@ def serve_layout():
                     dash_table.DataTable(
 
                         id='budget-table',
-                        columns=[{"name": i, "id": i} for i in budget[['budget_head', 'goal', 'budgetted', 'debit', 'mean']].columns],
-                        data=budget[['budget_head', 'goal', 'budgetted', 'debit', 'mean']].to_dict('records'),
+                        columns=[{"name": i, "id": i} for i in budget_summary()[['budget_head', 'goal', 'budgetted', 'debit', 'mean']].columns],
+                        data=budget_summary()[['budget_head', 'goal', 'budgetted', 'debit', 'mean']].to_dict('records'),
                     )
 
                 
@@ -132,7 +140,7 @@ def serve_layout():
 
                 html.Div(id='budget-graph', style={'margin': '10px'}, children=[
 
-                    dcc.Graph(figure=budget_fig)
+                    dcc.Graph(figure=budget_fig_gen())
                 ]),
         ]),
 
@@ -150,8 +158,8 @@ def serve_layout():
                     dash_table.DataTable(
 
                         id='income-table',
-                        columns=[{"name": i, "id": i} for i in income_high.columns],
-                        data=income_high.to_dict('records'),
+                        columns=[{"name": i, "id": i} for i in income_high().columns],
+                        data=income_high().to_dict('records'),
                         style_data={
                             'whiteSpace': 'normal',
                             'height': 'auto'
@@ -163,7 +171,7 @@ def serve_layout():
 
                 html.Div(id='income-graph', style={'margin': '10px'}, children=[
 
-                    dcc.Graph(figure=income_fig)
+                    dcc.Graph(figure=income_fig_gen())
                 ]),
 
         ]),
@@ -183,8 +191,8 @@ def serve_layout():
                     dash_table.DataTable(
 
                         id='expense-table',
-                        columns=[{"name": i, "id": i} for i in expense_high.columns],
-                        data=expense_high.to_dict('records'),
+                        columns=[{"name": i, "id": i} for i in expense_high().columns],
+                        data=expense_high().to_dict('records'),
                         style_data={
                             'whiteSpace': 'normal',
                             'height': 'auto'
@@ -196,7 +204,7 @@ def serve_layout():
 
                 html.Div(id='expense-graph', style={'margin': '10px'}, children=[
 
-                    dcc.Graph(figure=expense_fig)
+                    dcc.Graph(figure=expense_fig_gen())
                 ]),
 
         ]),
@@ -213,7 +221,7 @@ def serve_layout():
                 
                 html.H3('Loaned Money'),
                 
-                current_debt[1]
+                current_debt()[1]
                 # Add a div for diplaying networth here
 
             ]),
@@ -222,7 +230,7 @@ def serve_layout():
                 
                 html.H3('Owed Money'),
                 
-                current_debt[2]
+                current_debt()[2]
                 # Add a div for diplaying networth here
 
             ]),
@@ -231,10 +239,14 @@ def serve_layout():
         ]),
 
         html.Div(id='investments', children=[
+
             html.H2('Investments'),
             # Add more components for section 7 here
+        
         ]), 
+    
     ])
+    
     return layout
 
 app.layout = serve_layout
