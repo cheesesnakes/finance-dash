@@ -23,6 +23,11 @@ from logic import expense_high
 from figs import expense_fig_gen
 from logic import reimbursement
 from logic import current_debt
+from logic import get_investments
+from logic import net_value
+from figs import instruments_fig
+from figs import equities_fig
+from figs import mutual_funds_fig
 
 # Initialize the app
 app = dash.Dash(__name__)
@@ -35,6 +40,7 @@ def serve_layout():
     budget = budget_summary(transactions)
     debt = get_debt()
     accounts_ = accounts(transactions)
+    investments = get_investments()
 
     layout = html.Div(style={'display': 'flex', 'flex-direction': 'column', 'align-items': 'center'}, children=[
         html.H1("Shawn's Financial Dashboard"),
@@ -60,7 +66,7 @@ def serve_layout():
                 
                 html.H3('Net Worth'),
                 
-                round(networth(accounts_, debt))
+                round(networth(accounts_, debt, investments))
                 # Add a div for diplaying networth here
 
             ]), 
@@ -87,7 +93,7 @@ def serve_layout():
                 
                 html.H3('Investment'),
 
-                "TBD"
+                round(net_value(investments))
             ]),
 
             # Add a div for investment here
@@ -241,9 +247,43 @@ def serve_layout():
         html.Div(id='investments', children=[
 
             html.H2('Investments'),
-            # Add more components for section 7 here
+            
+            # create two divs, one for instruments_fig and one for equities_fig and mutual_funds_fig in a flexbox
+
+            html.Div(id='investments-2', style={'display':'flex'},children=[
+
+                html.Div(id='instruments', style={'margin': '30px'}, children=[
+                
+                html.H3('Instruments'),
+                
+                dcc.Graph(figure=instruments_fig(investments))
+                # Add a div for diplaying networth here
+
+            ]),
+
+            html.Div(id='equities', style={'margin': '30px'}, children=[
+                
+                html.H3('Equities'),
+                
+                dcc.Graph(figure=equities_fig(investments))
+                # Add a div for diplaying networth here
+
+            ]),
+
+            html.Div(id='mutual-funds', style={'margin': '30px'}, children=[
+                
+                html.H3('Mutual Funds'),
+                
+                dcc.Graph(figure=mutual_funds_fig(investments))
+                # Add a div for diplaying networth here
+
+            ]),
+
+
         
         ]), 
+
+        ]),
     
     ])
     
@@ -253,4 +293,5 @@ app.layout = serve_layout
 
 # Run the app
 if __name__ == '__main__':
-    app.run_server(host='0.0.0.0')
+    #app.run_server(host='0.0.0.0')
+    app.run_server(debug=True)

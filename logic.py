@@ -67,6 +67,13 @@ def get_debt():
   
   return debt
 
+def get_investments():
+
+  investments = get_data("investments")
+  investments['Current-value'] = pd.to_numeric(investments['Current-value'])
+  investments['invested'] = pd.to_numeric(investments['invested'])
+  return investments
+
 # last review date
 
 def last_review_date(transactions):
@@ -107,9 +114,9 @@ def accounts_table(transactions):
 
 # Networth
 
-def networth(accounts, debt):
+def networth(accounts, debt, investments):
   print("Caclulated networth")
-  return accounts['balance'].sum() + list(debt.iloc[-1])[1] - list(debt.iloc[-1])[2]
+  return accounts['balance'].sum() + list(debt.iloc[-1])[1] - list(debt.iloc[-1])[2] + investments['Current-value'].sum()
 
 # Loan and debt summaries
 
@@ -129,6 +136,10 @@ def reimbursement(transactions):
 
   return -work_expense['credit'].sum() + work_expense['debit'].sum()
 
+# calculate current investment value
+
+def net_value(investment):
+  return investment['Current-value'].sum()
 # Budget summary
 
 def budget_summary(transactions):

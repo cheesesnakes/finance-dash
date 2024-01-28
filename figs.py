@@ -1,6 +1,8 @@
 import pandas as pd
 import plotly.express as px
 from logic import budget_summary, accounts, earn_calc, spend_calc, income_calc, expense_calc
+import plotly.graph_objects as go
+import numpy as np
 
 # make budegt figure
 
@@ -118,3 +120,76 @@ def expense_fig_gen(transactions, budget):
         )
     
     return expense_fig
+
+# plot a flipped bar graph of total profit (Current-value - invested) by type in investments
+
+def instruments_fig(investments):
+
+    # the investments dataframe has name, type, invested, Current-value
+
+    # calculate profit
+
+    investments['profit'] = investments['Current-value'] - investments['invested']
+
+    # calculate percentage profit
+
+    investments['percent-profit'] = investments['profit']*100/investments['invested']
+
+    # remove infinities in percent profit
+
+    investments = investments.replace([np.inf, -np.inf], np.nan).dropna(subset=["percent-profit"], how="all")
+
+    # calculate mean and standard deviation of percent profit grouped by type
+    grouped_investments = investments.groupby('type')['percent-profit'].agg(['mean', 'std']).reset_index()
+
+    # plot mean and std as error bars on a bar plot
+    instruments_fig = px.bar(grouped_investments, x='type', y='mean', error_y='std', width=750, height=450)
+
+    # make consistent with other figs
+    instruments_fig.update_layout(title={"text":'Mean and Standard Deviation of Percent Profit by Instrument Type', "xanchor":"center", "x":0.5}, yaxis_title='Percent Profit', xaxis_title='Instrument Type', font = {"size":16})
+
+    return instruments_fig
+
+def equities_fig(investments):
+
+    # the investments dataframe has name, type, invested, Current-value
+
+    # select only equities
+
+    equities = investments[investments['type'] == 'Equity']
+
+    # plot invested and current value as side by side bars
+
+    equities_fig = px.bar(equities, y='name', x=['invested', 'Current-value'], barmode = "group", width=750, height=450)
+
+    # make consistent with other figs
+
+    equities_fig.update_layout(title={"text":'Invested vs Current Value of Equities', "xanchor":"center", "x":0.5}, xaxis_title='Amount', yaxis_title='Equity', font = {"size":18})
+    
+    # reduce y axis font size
+
+    equities_fig.update_yaxes(tickfont=dict(size=10))
+
+    return equities_fig
+
+def mutual_funds_fig(investments):
+
+    # the investments dataframe has name, type, invested, Current-value
+
+    # select only mutual funds
+
+    mutual_funds = investments[investments['type'] == 'Mutual Fund']
+
+    # plot invested and current value as side by side bars
+
+    mutual_funds_fig = px.bar(mutual_funds, y='name', x=['invested', 'Current-value'], barmode = "group", width=750, height=450)
+
+    # make consistent with other figs
+
+    mutual_funds_fig.update_layout(title={"text":'Invested vs Current Value of Mutual Funds', "xanchor":"center", "x":0.5}, xaxis_title='Amount', yaxis_title='Mutual Fund', font = {"size":18})
+
+    # reduce y axis font size
+
+    mutual_funds_fig.update_yaxes(tickfont=dict(size=10))
+
+    return mutual_funds_fig

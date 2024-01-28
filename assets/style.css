@@ -40,16 +40,16 @@ h1, h2, h3 {
         flex-wrap: wrap;
     }
     #summary-2 > div {
-        flex: 1 0 100%;  /* Grow and shrink equally, don't allow flex items to shrink below 100% width */
+        flex: 1 1 50%;  /* Grow and shrink equally, don't allow flex items to shrink below 100% width */
     }
 }
 
-@media (max-width: 1500px) {
-    #summary-2, #budget-2, #income-2, #expense-2, #balance-2, #investments-2 {
+@media (max-width: 1200px) {
+    #budget-2, #income-2, #expense-2, #balance-2, #investments-2 {
         flex-direction: column !important;
     }
-    #summary-2 > div, #budget-2 > div, #income-2 > div, #expense-2 > div, #balance-2 > div, #investments-2 > div {
-        flex: 1 0 100%;  /* Grow and shrink equally, don't allow flex items to shrink below 100% width */
+    #budget-2 > div, #income-2 > div, #expense-2 > div, #balance-2 > div, #investments-2 > div {
+        flex: 1 1 50%;  /* Grow and shrink equally, don't allow flex items to shrink below 100% width */
     }
     #review-date, #networth, #available, #investment, #reimbursement, #loaned, #owed {
         margin: 10px;
@@ -59,6 +59,15 @@ h1, h2, h3 {
         padding: 10px;
         margin-bottom: 10px;
     }
+}
+
+@media (max-width: 1000px) {
+    
+    #budget-graph > div, #income-graph, #expense-graph, #account-graph, #trend-graph {
+        width: 50vh;
+        height: 50vh;
+    }
+
 }
 
 #budget-table, #income-table, #expense-table{
