@@ -125,6 +125,10 @@ def expense_fig_gen(transactions, budget):
 
 def instruments_fig(investments):
 
+    # filter latest investments
+
+    investments = investments[investments['date'] == investments['date'].max()]
+
     # the investments dataframe has name, type, invested, Current-value
 
     # calculate profit
@@ -152,6 +156,10 @@ def instruments_fig(investments):
 
 def equities_fig(investments):
 
+    # filter latest investments
+
+    investments = investments[investments['date'] == investments['date'].max()]
+
     # the investments dataframe has name, type, invested, Current-value
 
     # select only equities
@@ -174,6 +182,10 @@ def equities_fig(investments):
 
 def mutual_funds_fig(investments):
 
+    # filter latest investments
+
+    investments = investments[investments['date'] == investments['date'].max()]
+
     # the investments dataframe has name, type, invested, Current-value
 
     # select only mutual funds
@@ -193,3 +205,24 @@ def mutual_funds_fig(investments):
     mutual_funds_fig.update_yaxes(tickfont=dict(size=10))
 
     return mutual_funds_fig
+
+# figure to detemine change in net value of investments over time by type
+
+def net_value_fig(investments):
+
+
+    # the investments dataframe has name, type, invested, Current-value
+
+    # get sum of current value by type and date
+
+    net_value = investments.groupby(['date', 'type'])['Current-value'].sum().reset_index()
+    
+    # plot sum of current value by type over date
+
+    net_value_fig = px.line(net_value, x='date', y='Current-value', color='type', width=750, height=450)
+
+    # make consistent with other figs
+
+    net_value_fig.update_layout(title={"text":'Change in Net Value of Investments over Time by Type', "xanchor":"center", "x":0.5}, xaxis_title='Date', yaxis_title='Current Value', font = {"size":16})
+    
+    return net_value_fig

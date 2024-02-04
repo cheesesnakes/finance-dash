@@ -28,6 +28,8 @@ from logic import net_value
 from figs import instruments_fig
 from figs import equities_fig
 from figs import mutual_funds_fig
+from figs import net_value_fig
+from logic import lic_debit
 
 # Initialize the app
 app = dash.Dash(__name__)
@@ -249,6 +251,7 @@ def serve_layout():
             html.H2('Investments'),
             
             # create two divs, one for instruments_fig and one for equities_fig and mutual_funds_fig in a flexbox
+            
 
             html.Div(id='investments-2', style={'display':'flex'},children=[
 
@@ -260,6 +263,20 @@ def serve_layout():
                 # Add a div for diplaying networth here
 
             ]),
+
+                html.Div(id='invest-trend', style={'margin': '30px'}, children=[
+                
+                html.H3('Instruments'),
+                
+                dcc.Graph(figure=net_value_fig(investments))
+                # Add a div for diplaying networth here
+
+            ]),
+
+            ]),
+
+            html.Div(id='investment-3', style={'display':'flex' }, children=[
+
 
             html.Div(id='equities', style={'margin': '30px'}, children=[
                 
@@ -283,6 +300,12 @@ def serve_layout():
         
         ]), 
 
+            html.Div(id='investment-4', style={'margin': '30px'}, children=[
+
+                html.H3('LIC Policies'),
+
+                round(lic_debit(transactions))
+            ]),
         ]),
     
     ])

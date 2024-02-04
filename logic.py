@@ -72,6 +72,7 @@ def get_investments():
   investments = get_data("investments")
   investments['Current-value'] = pd.to_numeric(investments['Current-value'])
   investments['invested'] = pd.to_numeric(investments['invested'])
+  investments['date'] = pd.to_datetime(investments['date'], format='%Y-%m-%d')
   return investments
 
 # last review date
@@ -115,6 +116,8 @@ def accounts_table(transactions):
 # Networth
 
 def networth(accounts, debt, investments):
+  # filter latest investments
+  investments = investments[investments['date'] == investments['date'].max()]
   print("Caclulated networth")
   return accounts['balance'].sum() + list(debt.iloc[-1])[1] - list(debt.iloc[-1])[2] + investments['Current-value'].sum()
 
@@ -139,6 +142,11 @@ def reimbursement(transactions):
 # calculate current investment value
 
 def net_value(investment):
+  
+  #filter only latest investment
+
+  investment = investment[investment['date'] == investment['date'].max()]
+
   return investment['Current-value'].sum()
 # Budget summary
 
@@ -287,6 +295,10 @@ def income_calc(transactions, budget):
 
   income_180 = income_180[~income_180['budget_head'].isin(account_list)]
 
+  # remove cigaratte expenses
+
+  income_180 = income_180[income_180['budget_head'] != 'Cigarettes']
+
   # filter out expenditure budget_heads
 
   budget_head_list = budget['budget_head'].tolist()
@@ -346,3 +358,8 @@ def expense_high(transactions, budget):
   expense_180 = expense_calc(transactions, budget)
 
   return expense_180.sort_values(by='debit', ascending=False).head(5)[['date', 'description', 'debit']]
+
+# get total debit for all investments with description "ACH D- LIC OF INDIA-9115721030522"
+
+def lic_debit(transactions):
+  return transactions[(transactions['description'].str.contains('ACH D- LIC OF INDIA-9115721030522')) & (transactions['debit'] > 0)]['debit'].sum()

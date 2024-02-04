@@ -18,7 +18,7 @@ h1, h2, h3 {
     box-shadow: 0 1px 0 rgba(27,31,35,0.04);
 }
 
-#summary-2, #budget-2, #income-2, #expense-2, #balance-2, #debts-2, #investments-2 {
+#summary-2, #budget-2, #income-2, #expense-2, #balance-2, #debts-2, #investments-2, #investment-3 {
     border: 1px solid #30363D;
     border-radius: 6px;
     padding: 20px;
@@ -28,7 +28,7 @@ h1, h2, h3 {
 }
 
 @media (max-width: 1750px) {
-    #budget-2, #income-2, #expense-2, #balance-2, #investments-2{
+    #budget-2, #income-2, #expense-2, #balance-2, #investments-2, #investment-3{
         flex-direction: column !important;
     }
 }
@@ -45,10 +45,10 @@ h1, h2, h3 {
 }
 
 @media (max-width: 1200px) {
-    #budget-2, #income-2, #expense-2, #balance-2, #investments-2 {
+    #budget-2, #income-2, #expense-2, #balance-2, #investments-2, #investment-3 {
         flex-direction: column !important;
     }
-    #budget-2 > div, #income-2 > div, #expense-2 > div, #balance-2 > div, #investments-2 > div {
+    #budget-2 > div, #income-2 > div, #expense-2 > div, #balance-2 > div, #investments-2 > div, #investment-3 > div {
         flex: 1 1 50%;  /* Grow and shrink equally, don't allow flex items to shrink below 100% width */
     }
     #review-date, #networth, #available, #investment, #reimbursement, #loaned, #owed {
@@ -79,9 +79,10 @@ h1, h2, h3 {
     color: #161B22;
 }
 
-#review-date, #networth, #available, #investment, #reimbursement, #loaned, #owed {
+#review-date, #networth, #available, #investment, #reimbursement, #loaned, #owed, #investment-4 {
     background-color: #323651;
     border-radius: 6px;
     padding: 20px;
     margin: 20px;
+    text-align: center;
 }
