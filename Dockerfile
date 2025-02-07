@@ -1,5 +1,5 @@
 # Use a Python base image
-FROM python:3.10.12
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -8,12 +8,10 @@ WORKDIR /app
 COPY . /app
 
 # Install required dependencies from requirements.txt
-RUN pip install --upgrade pip   
-
-RUN pip install -r requirements.txt
+RUN uv sync --frozen
 
 # Expose the port that dash uses
 EXPOSE 8050
 
 # Run Voilà when the container starts
-CMD ["python", "app.py"]
+CMD ["uv", "run", "app.py"]
