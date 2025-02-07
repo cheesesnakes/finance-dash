@@ -217,6 +217,7 @@ def spend_calc(transactions, budget):
   account_list.append('Work Expense')
 
   spend = spend[~spend['budget_head'].isin(account_list)]
+  
 
   ## filter out expenditure budget_heads
 
@@ -253,7 +254,7 @@ def earn_calc(transactions, budget):
   account_list = accounts(transactions).index.tolist()
 
   earn = earn[~earn['budget_head'].isin(account_list)]
-
+  
   ## filter out expenditure budget_heads
 
   budget_head_list = budget['budget_head'].tolist()
@@ -261,6 +262,10 @@ def earn_calc(transactions, budget):
   budget_head_list.append('Work Expense')
 
   earn = earn[~earn['budget_head'].isin(budget_head_list)]
+
+  ## remove accounts with 'Credit Card' in the string
+  
+  earn = earn[earn['budget_head'].str.contains('Credit Card') == False]
 
   ## Group the earn by month
   
