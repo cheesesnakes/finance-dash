@@ -1,7 +1,6 @@
 # a script to correctly format data from a csv named acc_stat
 
 import csv
-import os
 import re
 
 # open the csv file

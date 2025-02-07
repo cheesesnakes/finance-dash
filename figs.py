@@ -1,7 +1,5 @@
-import pandas as pd
 import plotly.express as px
 from logic import budget_summary, accounts, earn_calc, spend_calc, income_calc, expense_calc
-import plotly.graph_objects as go
 import numpy as np
 
 # make budegt figure
